@@ -13,11 +13,11 @@ spring:
       minimum-idle: 1
       idle-timeout: 30000
       max-lifetime: 600000
-      connection-timeout: 20000
+      connection-timeout: 30000
 
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: update
     show-sql: false
     properties:
       hibernate:
