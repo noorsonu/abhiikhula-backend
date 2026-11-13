@@ -24,8 +24,8 @@ public class JoinQueueRequest {
     private String source = "APP";
 
     @jakarta.validation.constraints.Min(value = 1, message = "Group size must be at least 1")
-    @jakarta.validation.constraints.Max(value = 4, message = "Group size cannot exceed 4 per booking")
-    @Schema(description = "Number of persons in group (1 to 4)", example = "3")
+    @jakarta.validation.constraints.Max(value = 10, message = "Group size cannot exceed 10 per booking")
+    @Schema(description = "Number of persons in group (1 to 10)", example = "3")
     @Builder.Default
     private Integer groupSize = 1;
 
