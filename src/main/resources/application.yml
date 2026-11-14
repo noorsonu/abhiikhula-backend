@@ -4,6 +4,14 @@ spring:
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:dev}
 
+  datasource:
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 3
+      idle-timeout: 30000
+      max-lifetime: 600000
+      connection-timeout: 10000
+
   jpa:
     open-in-view: false
 
