@@ -24,5 +24,8 @@ public class VerifyOtpRequest {
     @Pattern(regexp = "\\d{4,6}", message = "OTP must be numeric")
     @Schema(description = "OTP received on phone (Dev hardcoded: 1234)", example = "1234")
     private String otp;
+
+    @Schema(description = "Optional user full name for new registration", example = "Abhishek Sharma")
+    private String name;
 }
 

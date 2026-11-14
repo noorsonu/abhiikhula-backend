@@ -60,16 +60,23 @@ public class AuthServiceImpl implements AuthService {
             log.info("Phone {} not registered. Auto-registering new user.", phone);
             user = User.builder()
                     .phone(phone)
+                    .name(request.getName() != null && !request.getName().isBlank() ? request.getName().trim() : null)
                     .role(UserRole.CUSTOMER)
                     .language("hi")
                     .blocked(false)
                     .build();
             user = userRepository.save(user);
             isNewUser = true;
-        } else if (Boolean.TRUE.equals(user.getBlocked())) {
-            throw new UnauthorizedException("Your account has been suspended. Please contact support.");
-        } else if (Boolean.TRUE.equals(user.getDeleted())) {
-            throw new UnauthorizedException("This account has been deleted. Please register with a new number or contact support.");
+        } else {
+            if (user.getName() == null && request.getName() != null && !request.getName().isBlank()) {
+                user.setName(request.getName().trim());
+                user = userRepository.save(user);
+            }
+            if (Boolean.TRUE.equals(user.getBlocked())) {
+                throw new UnauthorizedException("Your account has been suspended. Please contact support.");
+            } else if (Boolean.TRUE.equals(user.getDeleted())) {
+                throw new UnauthorizedException("This account has been deleted. Please register with a new number or contact support.");
+            }
         }
 
         String token = jwtUtil.generateToken(user);
@@ -80,6 +87,7 @@ public class AuthServiceImpl implements AuthService {
                 .tokenType("Bearer")
                 .userId(user.getId())
                 .phone(user.getPhone())
+                .name(user.getName())
                 .role(user.getRole())
                 .newUser(isNewUser)
                 .build();

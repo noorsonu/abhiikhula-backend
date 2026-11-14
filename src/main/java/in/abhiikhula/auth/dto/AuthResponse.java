@@ -27,6 +27,9 @@ public class AuthResponse {
     @Schema(description = "User phone", example = "9876543210")
     private String phone;
 
+    @Schema(description = "User full name", example = "Abhishek Sharma")
+    private String name;
+
     @Schema(description = "User role", example = "SHOP_OWNER")
     private UserRole role;
 
