@@ -152,11 +152,23 @@ public class ShopServiceImpl implements ShopService {
     public ShopDetailDto createShop(CreateShopRequest request) {
         log.info("Creating new shop: {} in zone: {}", request.getName(), request.getZoneId());
 
-        Zone zone = zoneRepository.findById(request.getZoneId())
-                .orElseThrow(() -> new ResourceNotFoundException("Zone", "id", request.getZoneId()));
+        Zone zone = null;
+        if (request.getZoneId() != null) {
+            zone = zoneRepository.findById(request.getZoneId()).orElse(null);
+        }
+        if (zone == null) {
+            zone = zoneRepository.findAll().stream().findFirst()
+                    .orElseThrow(() -> new ResourceNotFoundException("Zone", "default", "No active zones configured in platform"));
+        }
 
-        Category category = categoryRepository.findById(request.getCategoryId())
-                .orElseThrow(() -> new ResourceNotFoundException("Category", "id", request.getCategoryId()));
+        Category category = null;
+        if (request.getCategoryId() != null) {
+            category = categoryRepository.findById(request.getCategoryId()).orElse(null);
+        }
+        if (category == null) {
+            category = categoryRepository.findAll().stream().findFirst()
+                    .orElseThrow(() -> new ResourceNotFoundException("Category", "default", "No active categories configured in platform"));
+        }
 
         Shop shop = shopMapper.toEntity(request, zone, category);
 
@@ -168,5 +180,14 @@ public class ShopServiceImpl implements ShopService {
         Shop savedShop = shopRepository.save(shop);
         log.info("Shop registered successfully with id: {}", savedShop.getId());
         return shopMapper.toDetailDto(savedShop, List.of());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ShopSummaryDto> getShopsByPhone(String phone) {
+        String clean = phone.replaceAll("\\D", "");
+        if (clean.length() > 10) clean = clean.substring(clean.length() - 10);
+        List<Shop> shops = shopRepository.findByPhoneContaining(clean);
+        return shops.stream().map(shopMapper::toSummaryDto).toList();
     }
 }

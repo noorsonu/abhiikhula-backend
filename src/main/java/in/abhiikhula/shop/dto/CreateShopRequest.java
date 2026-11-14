@@ -18,12 +18,10 @@ import java.util.UUID;
 @Schema(description = "Payload to register a new shop (BRD M6 / Section 17)")
 public class CreateShopRequest {
 
-    @NotNull(message = "Zone ID is mandatory")
-    @Schema(description = "UUID of the zone where shop is located")
+    @Schema(description = "UUID of the zone where shop is located (optional, defaults to pilot zone)")
     private UUID zoneId;
 
-    @NotNull(message = "Category ID is mandatory")
-    @Schema(description = "UUID of the shop vertical/category")
+    @Schema(description = "UUID of the shop vertical/category (optional, defaults to matched category)")
     private UUID categoryId;
 
     @NotBlank(message = "Shop name is mandatory")

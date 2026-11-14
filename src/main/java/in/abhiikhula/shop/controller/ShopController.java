@@ -80,4 +80,11 @@ public class ShopController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.ok(createdShop, "Shop registered successfully"));
     }
+
+    @GetMapping("/by-phone/{phone}")
+    @Operation(summary = "Get shops registered by phone number", description = "Fetches all shops registered under a specific phone number for instant login")
+    public ResponseEntity<ApiResponse<List<ShopSummaryDto>>> getShopsByPhone(@PathVariable String phone) {
+        List<ShopSummaryDto> shops = shopService.getShopsByPhone(phone);
+        return ResponseEntity.ok(ApiResponse.ok(shops, "Shops fetched for phone successfully"));
+    }
 }

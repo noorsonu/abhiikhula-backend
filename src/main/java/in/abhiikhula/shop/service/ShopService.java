@@ -19,4 +19,6 @@ public interface ShopService {
     ShopDetailDto getShopBySlug(String slug);
 
     ShopDetailDto createShop(CreateShopRequest request);
+
+    List<ShopSummaryDto> getShopsByPhone(String phone);
 }

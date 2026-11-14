@@ -59,6 +59,8 @@ public interface ShopRepository extends JpaRepository<Shop, UUID> {
 
     List<Shop> findByOwnerId(UUID ownerId);
 
+    List<Shop> findByPhoneContaining(String phone);
+
     List<Shop> findByZoneId(UUID zoneId);
 
     long countByVerified(Boolean verified);

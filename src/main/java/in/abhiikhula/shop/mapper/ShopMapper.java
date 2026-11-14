@@ -74,7 +74,7 @@ public interface ShopMapper {
     @Mapping(target = "lat", source = "request.lat")
     @Mapping(target = "lng", source = "request.lng")
     @Mapping(target = "phone", source = "request.phone")
-    @Mapping(target = "status", constant = "CLOSED")
+    @Mapping(target = "status", constant = "OPEN")
     @Mapping(target = "crowdLevel", constant = "1")
     @Mapping(target = "tokenCap", source = "request.tokenCap")
     @Mapping(target = "verified", constant = "false")

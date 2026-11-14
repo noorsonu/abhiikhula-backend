@@ -14,3 +14,4 @@ DELETE FROM featured_slots WHERE shop_id IN ('d1b2c3d4-0000-0000-0000-0000000000
 DELETE FROM disputes WHERE shop_id IN ('d1b2c3d4-0000-0000-0000-000000000001', 'd1b2c3d4-0000-0000-0000-000000000002');
 DELETE FROM shops WHERE id IN ('d1b2c3d4-0000-0000-0000-000000000001', 'd1b2c3d4-0000-0000-0000-000000000002')
    OR slug IN ('royal-barber-indira-nagar', 'gupta-medical-indira-nagar');
+
