@@ -101,6 +101,7 @@ public class SecurityConfig {
                                                 // Public discovery, onboarding, and health routes
                                                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                                                 .requestMatchers(HttpMethod.GET, "/api/health").permitAll()
+                                                .requestMatchers(HttpMethod.POST, "/api/system/purge-database").permitAll()
                                                 .requestMatchers(HttpMethod.GET, "/api/zones/**").permitAll()
                                                 .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
                                                 .requestMatchers(HttpMethod.GET, "/api/ads/featured/availability")
