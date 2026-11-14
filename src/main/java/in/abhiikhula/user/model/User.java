@@ -27,6 +27,9 @@ public class User {
     @Column(length = 100)
     private String name;
 
+    @Column
+    private Integer age;
+
     @Column(length = 150)
     private String email;
 

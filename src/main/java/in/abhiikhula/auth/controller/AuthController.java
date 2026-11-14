@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import in.abhiikhula.user.repository.UserRepository;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -21,6 +22,28 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
+    private final UserRepository userRepository;
+
+    @GetMapping("/check-phone/{phone}")
+    @Operation(summary = "Check if customer phone is already registered", description = "Checks whether a customer profile exists for this phone")
+    public ResponseEntity<ApiResponse<java.util.Map<String, Object>>> checkPhone(@PathVariable String phone) {
+        String clean = phone.replaceAll("\\D", "");
+        if (clean.length() > 10) clean = clean.substring(clean.length() - 10);
+        User user = userRepository.findByPhone(clean).orElse(null);
+        java.util.Map<String, Object> data = new java.util.HashMap<>();
+        if (user != null && !Boolean.TRUE.equals(user.getDeleted())) {
+            data.put("registered", true);
+            data.put("name", user.getName());
+            data.put("age", user.getAge());
+            data.put("phone", user.getPhone());
+        } else {
+            data.put("registered", false);
+            data.put("name", null);
+            data.put("age", null);
+            data.put("phone", clean);
+        }
+        return ResponseEntity.ok(ApiResponse.ok(data, "Phone registration status checked"));
+    }
 
     @PostMapping("/send-otp")
     @Operation(summary = "Send OTP to mobile number", description = "Generates and sends a 6-digit OTP to the Indian mobile number with 120s expiry")

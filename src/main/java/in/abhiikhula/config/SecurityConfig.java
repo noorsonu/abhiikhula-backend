@@ -131,6 +131,7 @@ public class SecurityConfig {
                                                 // Public auth login/OTP routes
                                                 .requestMatchers(HttpMethod.POST, "/api/auth/send-otp").permitAll()
                                                 .requestMatchers(HttpMethod.POST, "/api/auth/verify-otp").permitAll()
+                                                .requestMatchers(HttpMethod.GET, "/api/auth/check-phone/**").permitAll()
 
                                                 // Public API documentation
                                                 .requestMatchers(

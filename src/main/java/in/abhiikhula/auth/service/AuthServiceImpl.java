@@ -34,9 +34,17 @@ public class AuthServiceImpl implements AuthService {
 
         String otp = otpStore.generateAndStore(phone);
 
+        User user = userRepository.findByPhone(phone).orElse(null);
+        boolean isRegistered = (user != null && !Boolean.TRUE.equals(user.getDeleted()));
+        String existingName = user != null ? user.getName() : null;
+        Integer existingAge = user != null ? user.getAge() : null;
+
         return SendOtpResponse.builder()
                 .message("OTP sent successfully to " + phone + " (Dev OTP: 1234)")
                 .expiresInSeconds(otpStore.ttlSeconds())
+                .registered(isRegistered)
+                .name(existingName)
+                .age(existingAge)
                 .build();
     }
 
@@ -61,6 +69,7 @@ public class AuthServiceImpl implements AuthService {
             user = User.builder()
                     .phone(phone)
                     .name(request.getName() != null && !request.getName().isBlank() ? request.getName().trim() : null)
+                    .age(request.getAge())
                     .role(UserRole.CUSTOMER)
                     .language("hi")
                     .blocked(false)
@@ -68,8 +77,16 @@ public class AuthServiceImpl implements AuthService {
             user = userRepository.save(user);
             isNewUser = true;
         } else {
-            if (user.getName() == null && request.getName() != null && !request.getName().isBlank()) {
+            boolean updated = false;
+            if (request.getName() != null && !request.getName().isBlank() && (user.getName() == null || user.getName().isBlank())) {
                 user.setName(request.getName().trim());
+                updated = true;
+            }
+            if (request.getAge() != null && user.getAge() == null) {
+                user.setAge(request.getAge());
+                updated = true;
+            }
+            if (updated) {
                 user = userRepository.save(user);
             }
             if (Boolean.TRUE.equals(user.getBlocked())) {
@@ -88,6 +105,7 @@ public class AuthServiceImpl implements AuthService {
                 .userId(user.getId())
                 .phone(user.getPhone())
                 .name(user.getName())
+                .age(user.getAge())
                 .role(user.getRole())
                 .newUser(isNewUser)
                 .build();

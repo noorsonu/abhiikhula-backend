@@ -27,5 +27,8 @@ public class VerifyOtpRequest {
 
     @Schema(description = "Optional user full name for new registration", example = "Abhishek Sharma")
     private String name;
+
+    @Schema(description = "Optional user age for new registration", example = "25")
+    private Integer age;
 }
 

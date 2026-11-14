@@ -16,5 +16,14 @@ public class SendOtpResponse {
 
     @Schema(description = "OTP expiry in seconds", example = "120")
     private int expiresInSeconds;
+
+    @Schema(description = "Whether this phone is already registered as a customer")
+    private boolean registered;
+
+    @Schema(description = "Existing customer name if already registered", example = "Abhishek Sharma")
+    private String name;
+
+    @Schema(description = "Existing customer age if already registered", example = "25")
+    private Integer age;
 }
 
