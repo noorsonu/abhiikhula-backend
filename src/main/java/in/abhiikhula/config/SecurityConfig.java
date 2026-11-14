@@ -39,10 +39,22 @@ public class SecurityConfig {
         }
 
         @Bean
+        public org.springframework.web.cors.CorsConfigurationSource corsConfigurationSource() {
+                org.springframework.web.cors.CorsConfiguration configuration = new org.springframework.web.cors.CorsConfiguration();
+                configuration.setAllowedOriginPatterns(java.util.List.of("*"));
+                configuration.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+                configuration.setAllowedHeaders(java.util.List.of("*"));
+                configuration.setAllowCredentials(true);
+                org.springframework.web.cors.UrlBasedCorsConfigurationSource source = new org.springframework.web.cors.UrlBasedCorsConfigurationSource();
+                source.registerCorsConfiguration("/**", configuration);
+                return source;
+        }
+
+        @Bean
         public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
                 http
                                 .csrf(AbstractHttpConfigurer::disable)
-                                .cors(AbstractHttpConfigurer::disable)
+                                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                                 .sessionManagement(session -> session
                                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                                 .exceptionHandling(exceptions -> exceptions
@@ -86,7 +98,8 @@ public class SecurityConfig {
                                                 .requestMatchers(HttpMethod.POST, "/api/shops/*/disputes/*/reply")
                                                 .authenticated()
 
-                                                // Public discovery and health routes
+                                                // Public discovery, onboarding, and health routes
+                                                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                                                 .requestMatchers(HttpMethod.GET, "/api/health").permitAll()
                                                 .requestMatchers(HttpMethod.GET, "/api/zones/**").permitAll()
                                                 .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
@@ -95,6 +108,9 @@ public class SecurityConfig {
                                                 .requestMatchers(HttpMethod.POST, "/api/ads/featured/*/click")
                                                 .permitAll()
                                                 .requestMatchers(HttpMethod.GET, "/api/shops/**").permitAll()
+                                                .requestMatchers(HttpMethod.POST, "/api/shops").permitAll()
+                                                .requestMatchers(HttpMethod.POST, "/api/shops/*/queue/tokens/join").permitAll()
+                                                .requestMatchers(HttpMethod.POST, "/api/shops/*/tokens").permitAll()
                                                 .requestMatchers(HttpMethod.GET, "/api/config/**").permitAll()
                                                 .requestMatchers(HttpMethod.GET, "/api/tokens/*").permitAll()
 
