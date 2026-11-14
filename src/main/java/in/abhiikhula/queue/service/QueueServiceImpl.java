@@ -833,6 +833,22 @@ public class QueueServiceImpl implements QueueService {
         return queueMapper.toTokenResponseDtoList(tokens);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<TokenResponseDto> getShopTokens(UUID shopId) {
+        if (shopId == null) {
+            return List.of();
+        }
+        QueueSession session = queueSessionRepository
+                .findByShopIdAndStatusIn(shopId, List.of(SessionStatus.ACTIVE, SessionStatus.PAUSED))
+                .orElse(null);
+        if (session == null) {
+            return List.of();
+        }
+        List<Token> tokens = tokenRepository.findBySessionIdOrderByTokenNumberAsc(session.getId());
+        return queueMapper.toTokenResponseDtoList(tokens);
+    }
+
     private String maskPhone(String phone) {
         if (phone == null || phone.length() < 4) {
             return null;

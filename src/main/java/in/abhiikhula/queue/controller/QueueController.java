@@ -27,6 +27,7 @@ public class QueueController {
 
     private final QueueService queueService;
     private final in.abhiikhula.queue.sse.QueueSseBroadcaster queueSseBroadcaster;
+    private final in.abhiikhula.user.repository.UserRepository userRepository;
 
     @PostMapping({"/api/shops/{shopId}/queue/tokens/join", "/api/shops/{shopId}/tokens"})
     @SecurityRequirement(name = "bearerAuth")
@@ -37,12 +38,33 @@ public class QueueController {
             @AuthenticationPrincipal User currentUser) {
 
         if (currentUser == null) {
-            throw new UnauthorizedException("Login required to join queue");
+            String phone = (request != null && request.getCustomerPhone() != null) ? request.getCustomerPhone().replaceAll("\\D", "") : null;
+            if (phone != null && phone.length() >= 10) {
+                if (phone.length() > 10) phone = phone.substring(phone.length() - 10);
+                final String cleanPhone = phone;
+                currentUser = userRepository.findByPhone(cleanPhone)
+                        .orElseGet(() -> userRepository.save(User.builder()
+                                .phone(cleanPhone)
+                                .name(request.getCustomerName() != null && !request.getCustomerName().isBlank() ? request.getCustomerName().trim() : "Customer")
+                                .role(in.abhiikhula.user.model.UserRole.CUSTOMER)
+                                .language("hi")
+                                .blocked(false)
+                                .build()));
+            } else {
+                throw new UnauthorizedException("Login or 10-digit mobile number required to join queue");
+            }
         }
 
         JoinQueueRequest req = request != null ? request : new JoinQueueRequest();
         TokenResponseDto token = queueService.joinQueue(shopId, req, currentUser);
         return ResponseEntity.ok(ApiResponse.ok(token, "Successfully joined the queue"));
+    }
+
+    @GetMapping("/api/shops/{shopId}/queue/tokens")
+    @Operation(summary = "Get all active queue tokens for shop", description = "Fetches all tokens for the active queue session of the shop")
+    public ResponseEntity<ApiResponse<List<TokenResponseDto>>> getShopTokens(@PathVariable UUID shopId) {
+        List<TokenResponseDto> tokens = queueService.getShopTokens(shopId);
+        return ResponseEntity.ok(ApiResponse.ok(tokens, "Shop tokens fetched successfully"));
     }
 
     @PostMapping("/api/shops/{shopId}/queue/walk-in")
