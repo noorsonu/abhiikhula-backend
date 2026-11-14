@@ -140,10 +140,19 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGeneralException(Exception ex, HttpServletRequest request) {
         log.error("Unhandled server exception on path {}: ", request.getRequestURI(), ex);
+        String detailedMsg = ex.getMessage();
+        Throwable cause = ex.getCause();
+        while (cause != null && cause.getCause() != null) {
+            cause = cause.getCause();
+        }
+        if (cause != null && cause.getMessage() != null) {
+            detailedMsg = detailedMsg + " [Root Cause: " + cause.getMessage() + "]";
+        }
+
         ErrorResponse error = ErrorResponse.builder()
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
                 .errorCode("INTERNAL_SERVER_ERROR")
-                .message("An unexpected internal server error occurred.")
+                .message(detailedMsg != null ? detailedMsg : "An unexpected internal server error occurred.")
                 .path(request.getRequestURI())
                 .timestamp(Instant.now())
                 .build();
