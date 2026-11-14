@@ -50,3 +50,4 @@ SET name = EXCLUDED.name,
     icon = EXCLUDED.icon,
     default_service_min = EXCLUDED.default_service_min,
     active = EXCLUDED.active;
+

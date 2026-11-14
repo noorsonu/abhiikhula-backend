@@ -171,9 +171,17 @@ public class ShopServiceImpl implements ShopService {
         }
 
         Shop shop = shopMapper.toEntity(request, zone, category);
+        if (shop.getStrikes() == null) shop.setStrikes(0);
+        if (shop.getTokenCap() == null) shop.setTokenCap(100);
+        if (shop.getCrowdLevel() == null) shop.setCrowdLevel(1);
+        if (shop.getVerified() == null) shop.setVerified(false);
+        if (shop.getActive() == null) shop.setActive(true);
+        if (shop.getStatus() == null) shop.setStatus(in.abhiikhula.shop.model.ShopStatus.OPEN);
 
         // Ensure unique slug if collision occurs
-        if (shopRepository.existsBySlug(shop.getSlug())) {
+        if (shop.getSlug() == null || shop.getSlug().isBlank()) {
+            shop.setSlug("shop-" + UUID.randomUUID().toString().substring(0, 8));
+        } else if (shopRepository.existsBySlug(shop.getSlug())) {
             shop.setSlug(shop.getSlug() + "-" + UUID.randomUUID().toString().substring(0, 6));
         }
 
