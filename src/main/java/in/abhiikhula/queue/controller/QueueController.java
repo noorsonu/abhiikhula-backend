@@ -75,10 +75,6 @@ public class QueueController {
             @Valid @RequestBody(required = false) in.abhiikhula.queue.dto.IssueWalkInTokenRequest request,
             @AuthenticationPrincipal User currentUser) {
 
-        if (currentUser == null) {
-            throw new UnauthorizedException("Authentication required");
-        }
-
         in.abhiikhula.queue.dto.IssueWalkInTokenRequest req = request != null ? request : new in.abhiikhula.queue.dto.IssueWalkInTokenRequest();
         TokenResponseDto token = queueService.issueWalkInToken(shopId, req, currentUser);
         return ResponseEntity.ok(ApiResponse.ok(token, "Walk-in token issued successfully"));
@@ -90,10 +86,6 @@ public class QueueController {
     public ResponseEntity<ApiResponse<TokenResponseDto>> callNext(
             @PathVariable UUID shopId,
             @AuthenticationPrincipal User currentUser) {
-
-        if (currentUser == null) {
-            throw new UnauthorizedException("Authentication required");
-        }
 
         TokenResponseDto token = queueService.callNext(shopId, currentUser);
         return ResponseEntity.ok(ApiResponse.ok(token, "Next customer called successfully"));
@@ -107,10 +99,6 @@ public class QueueController {
             @PathVariable UUID tokenId,
             @AuthenticationPrincipal User currentUser) {
 
-        if (currentUser == null) {
-            throw new UnauthorizedException("Authentication required");
-        }
-
         TokenResponseDto token = queueService.completeToken(shopId, tokenId, currentUser);
         return ResponseEntity.ok(ApiResponse.ok(token, "Token service marked completed"));
     }
@@ -122,10 +110,6 @@ public class QueueController {
             @PathVariable UUID shopId,
             @PathVariable UUID tokenId,
             @AuthenticationPrincipal User currentUser) {
-
-        if (currentUser == null) {
-            throw new UnauthorizedException("Authentication required");
-        }
 
         TokenResponseDto token = queueService.markNoShow(shopId, tokenId, currentUser);
         return ResponseEntity.ok(ApiResponse.ok(token, "Token marked as NO_SHOW"));
@@ -139,10 +123,6 @@ public class QueueController {
             @PathVariable UUID tokenId,
             @AuthenticationPrincipal User currentUser) {
 
-        if (currentUser == null) {
-            throw new UnauthorizedException("Authentication required");
-        }
-
         TokenResponseDto token = queueService.skipToken(shopId, tokenId, currentUser);
         return ResponseEntity.ok(ApiResponse.ok(token, "Token marked as SKIPPED"));
     }
@@ -154,10 +134,6 @@ public class QueueController {
             @PathVariable UUID shopId,
             @Valid @RequestBody in.abhiikhula.queue.dto.UpdateQueueDelayRequest request,
             @AuthenticationPrincipal User currentUser) {
-
-        if (currentUser == null) {
-            throw new UnauthorizedException("Authentication required");
-        }
 
         QueueStatusResponseDto status = queueService.updateQueueDelay(shopId, request, currentUser);
         return ResponseEntity.ok(ApiResponse.ok(status, "Queue delay updated successfully"));

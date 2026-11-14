@@ -111,6 +111,7 @@ public class SecurityConfig {
                                                 .requestMatchers(HttpMethod.GET, "/api/shops/**").permitAll()
                                                 .requestMatchers(HttpMethod.POST, "/api/shops").permitAll()
                                                 .requestMatchers(HttpMethod.POST, "/api/shops/*/queue/tokens/join").permitAll()
+                                                .requestMatchers(HttpMethod.POST, "/api/shops/*/queue/**").permitAll()
                                                 .requestMatchers(HttpMethod.POST, "/api/shops/*/tokens").permitAll()
                                                 .requestMatchers(HttpMethod.GET, "/api/config/**").permitAll()
                                                 .requestMatchers(HttpMethod.GET, "/api/tokens/*").permitAll()

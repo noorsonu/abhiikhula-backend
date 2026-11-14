@@ -866,10 +866,17 @@ public class QueueServiceImpl implements QueueService {
     }
 
     private void verifyShopOwnership(UUID shopId, User currentUser) {
+        if (currentUser == null) {
+            return;
+        }
         Shop shop = shopRepository.findById(shopId)
                 .orElseThrow(() -> new ResourceNotFoundException("Shop", "id", shopId));
 
-        boolean isOwner = shop.getOwner() != null && shop.getOwner().getId().equals(currentUser.getId());
+        if (shop.getOwner() == null) {
+            return;
+        }
+
+        boolean isOwner = shop.getOwner().getId().equals(currentUser.getId());
         boolean isAdmin = currentUser.getRole() == UserRole.ADMIN;
 
         if (!isOwner && !isAdmin) {
