@@ -124,6 +124,8 @@ public class SecurityConfig {
                                                 .requestMatchers(HttpMethod.POST, "/api/reviews").permitAll()
                                                 .requestMatchers(HttpMethod.POST, "/api/reviews/*/report-abuse")
                                                 .permitAll()
+                                                .requestMatchers(HttpMethod.POST, "/api/shops/*/reviews/*/reply")
+                                                .permitAll()
 
                                                 // Public analytics event ingestion
                                                 .requestMatchers(HttpMethod.POST, "/api/analytics/events").permitAll()

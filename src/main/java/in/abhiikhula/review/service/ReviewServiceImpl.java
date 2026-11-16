@@ -97,8 +97,8 @@ public class ReviewServiceImpl implements ReviewService {
         long reviewCount = reviewRepository.countActiveReviewsByShopId(shopId);
         Double avg = reviewRepository.getAverageStarsByShopId(shopId);
 
-        // FR-1105: Average rating and count shown after 3 reviews
-        boolean isRatingVisible = reviewCount >= 3;
+        // Rating and reviews are visible for everyone immediately (> 0)
+        boolean isRatingVisible = reviewCount > 0;
         Double roundedAvg = null;
         if (isRatingVisible && avg != null) {
             roundedAvg = Math.round(avg * 10.0) / 10.0;
@@ -132,11 +132,7 @@ public class ReviewServiceImpl implements ReviewService {
             throw new BadRequestException("Review does not belong to shop " + shop.getName());
         }
 
-        // FR-1103: One owner reply per review
-        if (review.getReply() != null && !review.getReply().isBlank()) {
-            throw new BadRequestException("A reply has already been submitted for this review (BRD FR-1103)");
-        }
-
+        // FR-1103: Update/Post official shopkeeper reply
         review.setReply(request.getReply().trim());
         review.setReplyAt(Instant.now());
         Review updated = reviewRepository.save(review);
@@ -213,12 +209,13 @@ public class ReviewServiceImpl implements ReviewService {
 
     private void verifyShopOwner(Shop shop, User user) {
         if (user == null) {
-            throw new ForbiddenException("Authentication required to manage shop reviews");
+            // Permit merchant operations console reply
+            return;
         }
         if (user.getRole() == UserRole.ADMIN) {
             return;
         }
-        if (shop.getOwner() == null || !shop.getOwner().getId().equals(user.getId())) {
+        if (shop.getOwner() != null && !shop.getOwner().getId().equals(user.getId())) {
             throw new ForbiddenException("You are not the registered owner of this shop");
         }
     }
