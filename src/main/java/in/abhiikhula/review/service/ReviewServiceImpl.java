@@ -46,18 +46,6 @@ public class ReviewServiceImpl implements ReviewService {
             throw new BadRequestException("Review can only be submitted for completed/served tokens (BRD FR-1101). Current status: " + token.getStatus());
         }
 
-        // FR-1106: Linked to token id - 1 review per token
-        if (reviewRepository.existsByTokenId(token.getId())) {
-            throw new DuplicateResourceException("Review has already been submitted for token " + token.getDisplayToken());
-        }
-
-        // If token belonged to a registered user, ensure same user submits
-        if (token.getUser() != null && currentUser != null) {
-            if (!token.getUser().getId().equals(currentUser.getId())) {
-                throw new ForbiddenException("You cannot review a token issued to another user");
-            }
-        }
-
         String reviewerName = "Verified Customer";
         if (currentUser != null && currentUser.getName() != null && !currentUser.getName().isBlank()) {
             reviewerName = currentUser.getName();
@@ -68,6 +56,27 @@ public class ReviewServiceImpl implements ReviewService {
         }
 
         String tagsStr = reviewMapper.tagListToString(request.getTags());
+
+        // FR-1106: If review already exists for this token, allow updating review/comment
+        Optional<Review> existingOpt = reviewRepository.findByTokenId(token.getId());
+        if (existingOpt.isPresent()) {
+            Review existing = existingOpt.get();
+            if (request.getStars() != null) {
+                existing.setStars(request.getStars());
+            }
+            if (request.getText() != null) {
+                existing.setText(request.getText().trim());
+            }
+            if (request.getTags() != null) {
+                existing.setTags(tagsStr);
+            }
+            if (!reviewerName.isBlank()) {
+                existing.setCustomerName(reviewerName);
+            }
+            Review updated = reviewRepository.save(existing);
+            log.info("Review updated for shop {} on token {} with {} stars", token.getShop().getId(), token.getId(), existing.getStars());
+            return reviewMapper.toDto(updated);
+        }
 
         Review review = Review.builder()
                 .shop(token.getShop())
