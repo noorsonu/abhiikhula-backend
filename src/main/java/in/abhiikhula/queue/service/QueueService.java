@@ -43,6 +43,8 @@ public interface QueueService {
 
     List<TokenResponseDto> getMyActiveTokens(User currentUser);
 
+    List<TokenResponseDto> getMyTokenHistory(User currentUser);
+
     List<TokenResponseDto> getGroupTokens(UUID groupId, User currentUser);
 
     List<TokenResponseDto> getShopTokens(UUID shopId);

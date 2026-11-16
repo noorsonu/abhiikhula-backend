@@ -257,6 +257,18 @@ public class QueueController {
         return ResponseEntity.ok(ApiResponse.ok(tokens, "Active tokens fetched successfully"));
     }
 
+    @GetMapping("/api/queue/tokens/my/history")
+    @SecurityRequirement(name = "bearerAuth")
+    @Operation(summary = "Customer: Get my past / completed tokens history", description = "Fetches past completed and cancelled tokens for the logged-in customer.")
+    public ResponseEntity<ApiResponse<List<TokenResponseDto>>> getMyTokenHistory(@AuthenticationPrincipal User currentUser) {
+        if (currentUser == null) {
+            throw new UnauthorizedException("Authentication required");
+        }
+
+        List<TokenResponseDto> tokens = queueService.getMyTokenHistory(currentUser);
+        return ResponseEntity.ok(ApiResponse.ok(tokens, "Token history fetched successfully"));
+    }
+
     @GetMapping("/api/tokens/{tokenId}")
     @Operation(summary = "Get queue token status & live ETA", description = "Fetches individual token progress, people ahead count, and estimated wait (BRD Section 30, FR-1603). Masks phone for privacy.")
     public ResponseEntity<ApiResponse<TokenResponseDto>> getTokenById(

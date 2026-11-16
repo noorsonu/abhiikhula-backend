@@ -62,24 +62,14 @@ public class QueueServiceImpl implements QueueService {
             throw new BadRequestException("Queue is temporarily PAUSED by merchant. Please check back shortly.");
         }
 
-        // Anti-spam check: One active token per user per shop (BRD: Virtual Queue anti-flooding)
-        boolean hasActive = tokenRepository.existsByShopIdAndUserIdAndStatusIn(
-                shopId,
-                currentUser.getId(),
-                List.of(TokenStatus.WAITING, TokenStatus.CALLED, TokenStatus.SERVING)
-        );
-        if (hasActive) {
-            throw new BadRequestException("You already have an active token in this shop's queue.");
-        }
-
-        // Anti-hoarding check: Max active tokens per user across all shops (BRD Section 26: max_active_tokens_user)
-        int maxTokens = platformConfigService.getIntConfig("max_active_tokens_user", 3);
+        // Allow customers to book additional tokens for companions, friends or parallel queues up to limit
+        int maxTokens = platformConfigService.getIntConfig("max_active_tokens_user", 10);
         long activeUserTokens = tokenRepository.countByUserIdAndStatusIn(
                 currentUser.getId(),
                 List.of(TokenStatus.WAITING, TokenStatus.CALLED, TokenStatus.SERVING)
         );
         if (activeUserTokens >= maxTokens) {
-            throw new BadRequestException("You have reached the maximum active tokens limit (" + maxTokens + ") across shops.");
+            throw new BadRequestException("You have reached the maximum active tokens limit (" + maxTokens + ").");
         }
 
         // Get or Auto-create today's active session
@@ -787,6 +777,19 @@ public class QueueServiceImpl implements QueueService {
                 List.of(TokenStatus.WAITING, TokenStatus.CALLED, TokenStatus.SERVING)
         );
         return queueMapper.toTokenResponseDtoList(activeTokens);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<TokenResponseDto> getMyTokenHistory(User currentUser) {
+        if (currentUser == null) {
+            return List.of();
+        }
+        List<Token> historyTokens = tokenRepository.findByUserIdAndStatusInOrderByJoinedAtDesc(
+                currentUser.getId(),
+                List.of(TokenStatus.COMPLETED, TokenStatus.CANCELLED, TokenStatus.NO_SHOW, TokenStatus.EXPIRED)
+        );
+        return queueMapper.toTokenResponseDtoList(historyTokens);
     }
 
     @Override
