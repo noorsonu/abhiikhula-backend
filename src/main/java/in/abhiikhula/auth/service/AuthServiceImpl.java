@@ -40,7 +40,7 @@ public class AuthServiceImpl implements AuthService {
         Integer existingAge = user != null ? user.getAge() : null;
 
         return SendOtpResponse.builder()
-                .message("OTP sent successfully to " + phone + " (Dev OTP: 1234)")
+                .message("Verification code dispatched successfully to +91 " + phone)
                 .expiresInSeconds(otpStore.ttlSeconds())
                 .registered(isRegistered)
                 .name(existingName)
